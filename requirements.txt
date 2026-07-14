@@ -1,0 +1,13 @@
+# Colab-preinstalled (pinned to Colab runtime versions)
+numpy==2.0.2
+matplotlib==3.10.0
+scikit-learn==1.6.1
+scipy==1.16.3
+umap-learn==0.5.11
+torch==2.10.0
+torchvision==0.25.0
+
+# Installed by notebooks (not on Colab by default)
+hoomd>=4.0
+gsd
+freud
