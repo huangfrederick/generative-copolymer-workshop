@@ -5,11 +5,6 @@
 **Compute Platform:** Google Colab  
 **Prerequisites:** Basic Python proficiency, general understanding of polymer physics
 
-> **Current status: session outlines.** The notebooks in this repository are
-> outlines — each gives the topics its session covers and the published work it
-> builds on. The complete notebooks, with code and exercises, will be posted
-> here before the workshop begins, on **August 7**.
-
 ## Overview
 
 This workshop bridges molecular dynamics simulation, machine learning, and inverse design for soft matter systems. Over three days, participants will:
@@ -22,7 +17,9 @@ This workshop bridges molecular dynamics simulation, machine learning, and inver
 
 Each notebook is designed to run in Google Colab — click the "Open in Colab" badge at the top of any notebook to launch it, and the Python packages install in-notebook (no local *software* setup needed). Every notebook is standalone: none of them depend on having run an earlier one in the same session.
 
-**Data note:** every data and model artifact a notebook needs is published in a **data bundle on Zenodo** ([DOI 10.5281/zenodo.21382942](https://doi.org/10.5281/zenodo.21382942)) — the derived tables, the fitted PCA, the KDE renders, the GSD trajectories, the exhaustive-library features, and the trained GRU surrogate. There is nothing to download by hand and **no repository checkout is needed**: a bootstrap cell near the top of each notebook creates its workspace, then fetches, verifies, and extracts exactly the archives that notebook needs, on first use.
+**Data note:** every data and model artifact a notebook needs is published in a **data bundle on Zenodo** ([DOI 10.5281/zenodo.21382942](https://doi.org/10.5281/zenodo.21382942), see `data/master64/README.md`) — the derived tables, `pca.joblib`, the KDE renders, the GSD trajectories, the exhaustive-library features, and the trained GRU surrogate. No manual download and **no repository checkout** is needed: a `colab_bootstrap` cell near the top of each notebook creates the `../data` / `../models` workspace, and notebooks 02–09 then call `ensure_bundle(...)` (defined in each day's `data_bootstrap.py`) to fetch, sha256-verify, and extract exactly the archives they need, on first use. The bundle manifest is embedded in `data_bootstrap.py`, so verification works with nothing on disk.
+
+> **Why this matters:** the Colab badge opens *only* the `.ipynb` into a bare VM — no repo comes with it. Notebooks must therefore obtain their own data and helper code. Anything that assumes a checkout (a relative `../data` read before the bootstrap, or a `campaign/` import) will pass local testing and fail for every student. `build_notebooks.py` enforces the cell-magic half of this; see "Verifying on Colab" below for the rest.
 
 **First time?** Start with `day1/01_md_simulation.ipynb`.
 
@@ -59,8 +56,99 @@ Each notebook is designed to run in Google Colab — click the "Open in Colab" b
 
 ---
 
+## For Contributors
+
+Everything below this line is for instructors and developers working on the notebook content.
+
+### Repository Structure
+
+Notebooks are authored as plain Python scripts in [jupytext](https://jupytext.readthedocs.io/) percent format under `sources/`. Paired `.ipynb` files live in the top-level `day*/` directories for Colab compatibility. Always edit the `.py` files — diffs on `.ipynb` are collapsed on GitHub via `.gitattributes`.
+
+```
+day1/                              # Student-facing notebooks (.ipynb)
+day2/
+day3/
+sources/                           # Notebook sources (.py, percent format)
+├── day1/
+├── day2/
+└── day3/
+```
+
+### Jupytext Workflow
+
+Regenerate a single notebook after editing its `.py` source:
+
+```bash
+python build_notebooks.py sources/day1/01_md_simulation.py
+```
+
+Rebuild all notebooks:
+
+```bash
+python build_notebooks.py
+```
+
+`build_notebooks.py` wraps `jupytext --to ipynb` and additionally resolves any
+`# CDSE-INCLUDE: <file>` marker cells (used by Day 1 to splice in
+`day1/cdse_lab.py` and the shared install cell) before conversion, then strips
+the delivered notebook's jupytext pairing metadata.
+
+> **`day{1,2,3}/*.ipynb` are build outputs.** Never hand-edit them or run
+> `jupytext --sync` on them — edit the paired `.py` file under `sources/` and
+> rerun `build_notebooks.py`. A notebook with `CDSE-INCLUDE` markers no longer
+> matches its source line-for-line, so a sync would overwrite the spliced
+> content (or the marker) with the wrong side.
+
+### Local Development
+
+```bash
+pip install -r requirements.txt
+pip install jupytext
+```
+
+### Verifying on Colab
+
+Local execution is necessary but **not sufficient**. Two earlier test harnesses both passed
+while the notebooks were broken for every student, because each one silently provided
+something the Colab badge does not:
+
+- `tools/execute_notebooks.py` replaces install cells with `pass` (see `INSTALL_MARKERS`) and
+  runs papermill with `cwd` inside the repo. It therefore cannot see a broken install cell, and
+  never exercises a missing `../data`.
+- An earlier round of Colab testing used genuinely fresh CPU VMs, but each run began by
+  extracting a `repo.tar.gz` into `/content/repo` and `chdir`-ing into `dayN` — handing the
+  notebook both the repo and the working directory.
+
+A real test reproduces the **badge entry conditions**: a bare VM containing only the `.ipynb`.
+
+```bash
+colab new -s check
+colab upload -s check day1/01_md_simulation.ipynb /content/01.ipynb
+# run cells through the live kernel from /content, never chdir-ing into a checkout
+```
+
+Three things to know:
+
+- **`colab exec` defaults to a 30-second output timeout.** Long MD runs and the ~76 MB Zenodo
+  fetch are silent for far longer, so pass `--timeout` explicitly or the run dies mid-notebook
+  and looks like a notebook bug.
+- **`condacolab.install()` restarts the kernel.** Run that cell on its own, then resume.
+- **Check figures, not just exceptions.** A broken `<img>` fails silently — it does not raise.
+
+Bugs this catches that nothing else does: a `%%` cell magic below line 1 (now also caught at
+build time by `check_cell_magics`), a relative `../data` read before the bootstrap cell, a
+`campaign/` import, an unflushed GSD writer read back in a later cell, and an `import` in the
+same cell as the `conda install` that created the package.
+
+Prose style is checked separately with `tools/style_check.py`, calibrated against the original
+MATSE 219 lectures.
+
 ## License
 
 This work is licensed under a [Creative Commons Attribution 4.0 International License](LICENSE).
 
-Figures reproduced from published journal articles appear in these notebooks for educational use and are **not** covered by the CC BY 4.0 grant above; copyright in each remains with its publisher, and each is credited in place with its DOI. Reuse of those figures requires permission from the publisher, not from this repository's authors.
+Figures reproduced from published articles are listed in
+[`sources/figures/papers/NOTICE.md`](sources/figures/papers/NOTICE.md); most are
+excluded from the CC BY 4.0 grant above, except where that notice states
+otherwise (e.g. figures the notice marks as CC BY 4.0 or reused under their own
+open-access terms).
