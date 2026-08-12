@@ -53,3 +53,14 @@ Each notebook is designed to run in Google Colab — click the "Open in Colab" b
 | 7 | `07_inverse_design` | Day 3 Morning: Evolutionary optimization |
 | 8 | `08_design_challenge` | Day 3 Async: The Design Challenge |
 | 9 | `09_explainability` | Day 3 Afternoon: ExAI & capstone |
+
+## License
+
+This work is licensed under a [Creative Commons Attribution 4.0 International License](LICENSE).
+
+Figures reproduced from published articles (including those embedded in the
+notebooks) are listed in
+[`sources/figures/papers/NOTICE.md`](sources/figures/papers/NOTICE.md); most are
+excluded from the CC BY 4.0 grant above, except where that notice states
+otherwise (e.g. figures the notice marks as CC BY 4.0 or reused under their own
+open-access terms).
