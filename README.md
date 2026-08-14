@@ -11,7 +11,7 @@ This workshop bridges molecular dynamics simulation, machine learning, and inver
 
 1. **Generate** morphologies using coarse-grained MD (Kremer-Grest model via HOOMD-blue)
 2. **Embed** high-dimensional structural features into interpretable latent spaces (PCA, UMAP)
-3. **Design** novel copolymer sequences targeting specific morphologies using evolutionary optimization
+3. **Design** novel copolymer sequences targeting specific morphologies using surrogate-based search, generative models, and explainability
 
 ## Getting Started
 
@@ -29,7 +29,7 @@ Each notebook is designed to run in Google Colab — click the "Open in Colab" b
 |-----|-------|-------------|---------------|----------------|
 | 1 | **Representation** | MD Basics & Kremer-Grest | Running "The Virtual Lab" | CNNs & Feature Extraction |
 | 2 | **Embedding** | PCA/UMAP & Latent Space | Mapping to Master Dataset | RNNs & Forward Prediction |
-| 3 | **Inverse Design** | HTS vs. Evolutionary Opt. | The Design Challenge | ExAI & Capstone Review |
+| 3 | **Design** | Search & Optimization | The Design Challenge | Inverse Design & Explanations |
 
 ## Session Protocol
 
@@ -50,9 +50,9 @@ Each notebook is designed to run in Google Colab — click the "Open in Colab" b
 | 4 | `04_embedding` | Day 2 Morning: PCA & UMAP |
 | 5 | `05_mapping` | Day 2 Async: Map to master dataset |
 | 6 | `06_forward_prediction` | Day 2 Afternoon: RNN sequence→structure |
-| 7 | `07_inverse_design` | Day 3 Morning: Evolutionary optimization |
-| 8 | `08_design_challenge` | Day 3 Async: The Design Challenge |
-| 9 | `09_explainability` | Day 3 Afternoon: ExAI & capstone |
+| 7 | `07_inverse_design` | Day 3 Morning: Search & Optimization |
+| 8 | `08_design_challenge` | Day 3 Morning: The Design Challenge |
+| 9 | `09_explainability` | Day 3 Afternoon: Inverse Design & Explanations |
 
 ## License
 
